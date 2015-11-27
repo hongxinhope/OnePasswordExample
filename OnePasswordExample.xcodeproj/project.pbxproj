@@ -8,20 +8,35 @@
 
 /* Begin PBXBuildFile section */
 		D3013E2C1C07F81100266EE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3013E2B1C07F81100266EE2 /* AppDelegate.swift */; };
-		D3013E2E1C07F81100266EE2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3013E2D1C07F81100266EE2 /* ViewController.swift */; };
+		D3013E2E1C07F81100266EE2 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3013E2D1C07F81100266EE2 /* LoginViewController.swift */; };
 		D3013E311C07F81100266EE2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D3013E2F1C07F81100266EE2 /* Main.storyboard */; };
 		D3013E331C07F81100266EE2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D3013E321C07F81100266EE2 /* Assets.xcassets */; };
-		D3013E3E1C07FCC900266EE2 /* OnePasswordExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3013E3D1C07FCC900266EE2 /* OnePasswordExtension.framework */; };
+		D307215E1C082BA2006698A2 /* OnePasswordExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D307215D1C082BA2006698A2 /* OnePasswordExtension.framework */; };
+		D307215F1C082BA2006698A2 /* OnePasswordExtension.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D307215D1C082BA2006698A2 /* OnePasswordExtension.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D30721601C082BA2006698A2 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D307215F1C082BA2006698A2 /* OnePasswordExtension.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		D3013E281C07F81100266EE2 /* OnePasswordExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OnePasswordExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D3013E2B1C07F81100266EE2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		D3013E2D1C07F81100266EE2 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		D3013E2D1C07F81100266EE2 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		D3013E301C07F81100266EE2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D3013E321C07F81100266EE2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D3013E371C07F81100266EE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D3013E3D1C07FCC900266EE2 /* OnePasswordExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OnePasswordExtension.framework; path = Carthage/Build/iOS/OnePasswordExtension.framework; sourceTree = "<group>"; };
+		D307215D1C082BA2006698A2 /* OnePasswordExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OnePasswordExtension.framework; path = Carthage/Build/iOS/OnePasswordExtension.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,7 +44,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D3013E3E1C07FCC900266EE2 /* OnePasswordExtension.framework in Frameworks */,
+				D307215E1C082BA2006698A2 /* OnePasswordExtension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -39,9 +54,9 @@
 		D3013E1F1C07F81100266EE2 = {
 			isa = PBXGroup;
 			children = (
+				D307215D1C082BA2006698A2 /* OnePasswordExtension.framework */,
 				D3013E2A1C07F81100266EE2 /* OnePasswordExample */,
 				D3013E291C07F81100266EE2 /* Products */,
-				D3013E3D1C07FCC900266EE2 /* OnePasswordExtension.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -57,7 +72,7 @@
 			isa = PBXGroup;
 			children = (
 				D3013E2B1C07F81100266EE2 /* AppDelegate.swift */,
-				D3013E2D1C07F81100266EE2 /* ViewController.swift */,
+				D3013E2D1C07F81100266EE2 /* LoginViewController.swift */,
 				D3013E2F1C07F81100266EE2 /* Main.storyboard */,
 				D3013E321C07F81100266EE2 /* Assets.xcassets */,
 				D3013E371C07F81100266EE2 /* Info.plist */,
@@ -75,6 +90,7 @@
 				D3013E241C07F81100266EE2 /* Sources */,
 				D3013E251C07F81100266EE2 /* Frameworks */,
 				D3013E261C07F81100266EE2 /* Resources */,
+				D30721601C082BA2006698A2 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -135,7 +151,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D3013E2E1C07F81100266EE2 /* ViewController.swift in Sources */,
+				D3013E2E1C07F81100266EE2 /* LoginViewController.swift in Sources */,
 				D3013E2C1C07F81100266EE2 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
