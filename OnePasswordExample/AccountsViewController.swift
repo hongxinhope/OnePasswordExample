@@ -43,7 +43,7 @@ class AccountsViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 2
+        return 3
     }
     
     override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -68,9 +68,17 @@ class AccountsViewController: UITableViewController {
         
         let account = accountsData[indexPath.section]
         if indexPath.row == 0 {
-            cell!.textLabel!.text = "Username: \(account.username!)"
+            if let firstName = account.firstName, lastName = account.lastName {
+                cell!.textLabel!.text = "Name: \(firstName) \(lastName)"
+            }
         } else if indexPath.row == 1 {
-            cell!.textLabel!.text = "Password: \(account.password!)"
+            if let username = account.username {
+                cell!.textLabel!.text = "Username: \(username)"
+            }
+        } else if indexPath.row == 2 {
+            if let password = account.password {
+                cell!.textLabel!.text = "Password: \(password)"
+            }
         }
         
         return cell!

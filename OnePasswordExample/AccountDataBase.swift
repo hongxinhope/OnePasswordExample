@@ -65,10 +65,12 @@ class AccountDataBase: NSObject {
         return false
     }
     
-    class func accountAuthenticated(account account: Account) -> Bool {
+    class func accountAuthenticated(account account: Account) -> (authenticated: Bool, account: Account?) {
         if let storedAccount = fetchAccount(username: account.username!) {
-            return account.password == storedAccount.password
+            if account.password == storedAccount.password {
+                return (true, storedAccount)
+            }
         }
-        return false
+        return (false, nil)
     }
 }

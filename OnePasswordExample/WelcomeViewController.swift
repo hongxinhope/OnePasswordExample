@@ -12,7 +12,7 @@ class WelcomeViewController: UIViewController {
     // MARK: - Properties
     @IBOutlet weak var welcomeLabel: UILabel!
     
-    var username: String!
+    var loginAccount: Account!
     
     // MARK: - View life cycle
     override func viewDidLoad() {
@@ -23,13 +23,18 @@ class WelcomeViewController: UIViewController {
     
     // MARK: - Helper
     private func setupUI() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .Done, target: self, action: "didClickDone:")
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .Plain, target: self, action: "didClickCancel:")
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Change Password", style: .Done, target: self, action: "didClickChangePassword:")
         welcomeLabel.font = UIFont(name: "HelveticaNeue-Light", size: 40)
-        welcomeLabel.text = "Welcome \(username),\ryou have signed in successfully!"
+        welcomeLabel.text = "Welcome \(loginAccount.firstName!) \(loginAccount.lastName!),\ryou have signed in successfully!"
     }
     
     // MARK: - Selector
-    func didClickDone(sender: UIBarButtonItem) {
+    func didClickCancel(sender: UIBarButtonItem) {
         dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    func didClickChangePassword(sender: UIBarButtonItem) {
+        
     }
 }

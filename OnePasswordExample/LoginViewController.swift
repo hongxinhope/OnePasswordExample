@@ -32,6 +32,11 @@ class LoginViewController: UIViewController {
         static let buttonDisabledColor = UIColor(white: 190 / 255, alpha: 1)
     }
     
+    private struct AppInfo {
+        static let urlString = "app://OnePasswordExample"
+        static let title = "OnePasswordExample"
+    }
+    
     // MARK: - Properties
     @IBOutlet weak var usernameTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
@@ -40,6 +45,11 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var reminderLabel: UILabel!
     @IBOutlet weak var onePasswordButton: UIButton!
     @IBOutlet weak var loginFailedView: UIView!
+    
+    @IBOutlet weak var signupAdditionalView: UIView!
+    @IBOutlet weak var firstNameTextField: UITextField!
+    @IBOutlet weak var lastNameTextField: UITextField!
+    @IBOutlet weak var additionalViewHeight: NSLayoutConstraint!
     
     private var userInterfaceMode = UserInterfaceMode.Signin {
         didSet {
@@ -60,14 +70,18 @@ class LoginViewController: UIViewController {
     
     // MARK: - Helper
     private func setupUI() {
-        userInterfaceMode = .Signin
         resetUI()
+        updateUI()
         
         usernameTextField.enablesReturnKeyAutomatically = true
         passwordTextField.enablesReturnKeyAutomatically = true
+        firstNameTextField.enablesReturnKeyAutomatically = true
+        lastNameTextField.enablesReturnKeyAutomatically = true
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selectors.textFieldDidChange, name: UITextFieldTextDidChangeNotification, object: usernameTextField)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selectors.textFieldDidChange, name: UITextFieldTextDidChangeNotification, object: passwordTextField)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selectors.textFieldDidChange, name: UITextFieldTextDidChangeNotification, object: firstNameTextField)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selectors.textFieldDidChange, name: UITextFieldTextDidChangeNotification, object: lastNameTextField)
     }
     
     private func updateUI() {
@@ -75,15 +89,17 @@ class LoginViewController: UIViewController {
             signinButton.setTitle("Sign in", forState: .Normal)
             reminderLabel.text = "Don't have an account?"
             signupButton.setTitle("Sign up", forState: .Normal)
+            additionalViewHeight.constant = 0
         } else if userInterfaceMode == .Signup {
             signinButton.setTitle("Sign up", forState: .Normal)
             reminderLabel.text = "Already have an account?"
             signupButton.setTitle("Sign in", forState: .Normal)
+            additionalViewHeight.constant = 85
         }
         
         resetUI()
+        signupAdditionalView.hidden = userInterfaceMode == .Signin
         passwordTextField.secureTextEntry = userInterfaceMode == .Signin
-        onePasswordButton.hidden = userInterfaceMode == .Signup
         view.layoutIfNeeded()
     }
     
@@ -91,6 +107,8 @@ class LoginViewController: UIViewController {
         hideKeyboard()
         usernameTextField.text = nil
         passwordTextField.text = nil
+        firstNameTextField.text = nil
+        lastNameTextField.text = nil
         setSigninButtonEnabled(enabled: false)
         loginFailedView.hidden = true
     }
@@ -131,7 +149,7 @@ class LoginViewController: UIViewController {
         if userInterfaceMode == .Signin {
             signin(username: usernameTextField.text!, password: passwordTextField.text!)
         } else if userInterfaceMode == .Signup {
-            signup(username: usernameTextField.text!, password: passwordTextField.text!)
+            signup(username: usernameTextField.text!, password: passwordTextField.text!, firstName: firstNameTextField.text!, lastName: lastNameTextField.text!)
         }
     }
 
@@ -155,6 +173,12 @@ class LoginViewController: UIViewController {
         if !OnePasswordExtension.sharedExtension().isAppExtensionAvailable() {
             show1PasswordUnavailableAlert()
             return
+        } else {
+            if userInterfaceMode == .Signin {
+                loginFrom1Password(sender)
+            } else if userInterfaceMode == .Signup {
+                saveLoginTo1Password(sender)
+            }
         }
     }
     
@@ -165,21 +189,37 @@ class LoginViewController: UIViewController {
         presentViewController(navigationController, animated: true, completion: nil)
     }
     
-    // MARK: - TextField observer
-    func accountTextFieldDidChange(notification: NSNotification) {
-        loginFailedView.hidden = true
-        let enabled = usernameTextField.text?.isEmpty == false && passwordTextField.text?.isEmpty == false
-        setSigninButtonEnabled(enabled: enabled)
+    // MARK: - 1Password
+    private func loginFrom1Password(sender: UIButton) {
+        OnePasswordExtension.sharedExtension().findLoginForURLString(AppInfo.urlString, forViewController: self, sender: sender, completion: { (loginDictionary, error) -> Void in
+            if loginDictionary?.isEmpty == true {
+                return
+            }
+            
+            if let username = loginDictionary![AppExtensionUsernameKey] as? String {
+                self.usernameTextField.text = username
+                NSNotificationCenter.defaultCenter().postNotificationName(UITextFieldTextDidChangeNotification, object: self.usernameTextField)
+            }
+            if let password = loginDictionary![AppExtensionPasswordKey] as? String {
+                self.passwordTextField.text = password
+                NSNotificationCenter.defaultCenter().postNotificationName(UITextFieldTextDidChangeNotification, object: self.passwordTextField)
+            }
+            
+        })
+    }
+    
+    private func saveLoginTo1Password(sender: UIButton) {
+        
     }
     
     // MARK: - Account
     private func signin(username username: String, password: String) {
-        let account = Account.account(username: username, password: password)
+        let account = Account.account(username: username, password: password, firstName: nil, lastName: nil)
         
-        if AccountDataBase.accountAuthenticated(account: account) {
+        if AccountDataBase.accountAuthenticated(account: account).authenticated {
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let welcomeViewController = storyboard.instantiateViewControllerWithIdentifier(StoryboardID.welcomeViewController) as! WelcomeViewController
-            welcomeViewController.username = account.username
+            welcomeViewController.loginAccount = AccountDataBase.accountAuthenticated(account: account).account!
             let navigationController = UINavigationController(rootViewController: welcomeViewController)
             presentViewController(navigationController, animated: true, completion: nil)
         } else {
@@ -187,19 +227,31 @@ class LoginViewController: UIViewController {
         }
     }
     
-    private func signup(username username: String, password: String) {
+    private func signup(username username: String, password: String, firstName: String, lastName: String) {
         if AccountDataBase.accountExistent(username: username) {
             showReminderAlert(title: nil, message: "“\(username)” is already existent, please try another username")
             return
         }
         
-        let account = Account.account(username: username, password: password)
+        let account = Account.account(username: username, password: password, firstName: firstName, lastName: lastName)
         AccountDataBase.storeAccount(account, success: { Void in
             self.resetUI()
-            self.showReminderAlert(title: nil, message: "Successfully signed up “\(username)”")
+            self.showReminderAlert(title: "Congratulation!", message: "\(firstName) \(lastName), successfully signed up “\(username)”.")
             }, failure: { Void in
-                self.showReminderAlert(title: nil, message: "Failed to sign up “\(username)”")
+                self.showReminderAlert(title: "Sorry!", message: "\(firstName) \(lastName), fail to sign up “\(username)”.")
         })
+    }
+    
+    // MARK: - TextField observer
+    func accountTextFieldDidChange(notification: NSNotification) {
+        loginFailedView.hidden = true
+        
+        var enabled = usernameTextField.text?.isEmpty == false && passwordTextField.text?.isEmpty == false
+        if userInterfaceMode == .Signup {
+            enabled = enabled && firstNameTextField.text?.isEmpty == false && lastNameTextField.text?.isEmpty == false
+        }
+        
+        setSigninButtonEnabled(enabled: enabled)
     }
 }
 
