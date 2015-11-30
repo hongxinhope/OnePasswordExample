@@ -9,6 +9,16 @@
 import UIKit
 import OnePasswordExtension
 
+struct AppInfo {
+    static let urlString = "app://OnePasswordExample"
+    static let title = "OnePasswordExample"
+}
+
+struct Colors {
+    static let buttonEnabledColor = UIColor(red: 3 / 255, green: 169 / 255, blue: 244 / 255, alpha: 1)
+    static let buttonDisabledColor = UIColor(white: 190 / 255, alpha: 1)
+}
+
 class LoginViewController: UIViewController {
     // MARK: - Structs and enums
     enum UserInterfaceMode: Int {
@@ -27,14 +37,20 @@ class LoginViewController: UIViewController {
         static let welcomeViewController = "WelcomeViewController"
     }
     
-    private struct Colors {
-        static let buttonEnabledColor = UIColor(red: 3 / 255, green: 169 / 255, blue: 244 / 255, alpha: 1)
-        static let buttonDisabledColor = UIColor(white: 190 / 255, alpha: 1)
+    private struct Screen {
+        static let height: CGFloat = UIScreen.mainScreen().bounds.height
+        static let iPhone6PlusWidth: CGFloat = 736
+        static let iPhone6Width: CGFloat = 667
+        static let iPhone5Width: CGFloat = 568
+        static let iPhone4Width: CGFloat = 480
     }
     
-    private struct AppInfo {
-        static let urlString = "app://OnePasswordExample"
-        static let title = "OnePasswordExample"
+    private struct TopSpace {
+        static let defaultTop: CGFloat = 80
+        static let iPhone6PlusTop: CGFloat = 130
+        static let iPhone6Top: CGFloat = 80
+        static let iPhone5Top: CGFloat = 20
+        static let iPhone4Top: CGFloat = 0
     }
     
     // MARK: - Properties
@@ -51,6 +67,8 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var lastNameTextField: UITextField!
     @IBOutlet weak var additionalViewHeight: NSLayoutConstraint!
     
+    @IBOutlet weak var topSpace: NSLayoutConstraint!
+    
     private var userInterfaceMode = UserInterfaceMode.Signin {
         didSet {
             updateUI()
@@ -62,6 +80,24 @@ class LoginViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if Screen.height == Screen.iPhone6PlusWidth {
+            topSpace.constant = TopSpace.iPhone6PlusTop
+        } else if Screen.height == Screen.iPhone6Width {
+            topSpace.constant = TopSpace.iPhone6Top
+        } else if Screen.height == Screen.iPhone5Width {
+            topSpace.constant = TopSpace.iPhone5Top
+        } else if Screen.height == Screen.iPhone4Width {
+            topSpace.constant = TopSpace.iPhone4Top
+        } else {
+             topSpace.constant = TopSpace.defaultTop
+        }
+        
+        view.layoutIfNeeded()
     }
     
     deinit {
@@ -89,7 +125,7 @@ class LoginViewController: UIViewController {
             signinButton.setTitle("Sign in", forState: .Normal)
             reminderLabel.text = "Don't have an account?"
             signupButton.setTitle("Sign up", forState: .Normal)
-            additionalViewHeight.constant = 0
+            additionalViewHeight.constant = 3
         } else if userInterfaceMode == .Signup {
             signinButton.setTitle("Sign up", forState: .Normal)
             reminderLabel.text = "Already have an account?"
@@ -140,12 +176,28 @@ class LoginViewController: UIViewController {
         presentViewController(alert, animated: true, completion: nil)
     }
     
+    private func showSignupSuccessAlert(account account: Account) {
+        let alert = UIAlertController(title: "Congratulation!", message: "\(account.firstName!) \(account.lastName!), successfully signed up “\(account.username!)”.", preferredStyle: .Alert)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+        let loginAction = UIAlertAction(title: "Login", style: .Default) { (action) -> Void in
+            self.userInterfaceMode = .Signin
+            self.usernameTextField.text = account.username
+            self.passwordTextField.becomeFirstResponder()
+        }
+        
+        alert.addAction(cancelAction)
+        alert.addAction(loginAction)
+        presentViewController(alert, animated: true, completion: nil)
+    }
+    
     private func hideKeyboard() {
         UIApplication.sharedApplication().sendAction(Selectors.resignFirstResponder, to: nil, from: nil, forEvent: nil)
     }
 
     // MARK: - Selector
     @IBAction func didClickSigninButton(sender: UIButton) {
+        hideKeyboard()
+        
         if userInterfaceMode == .Signin {
             signin(username: usernameTextField.text!, password: passwordTextField.text!)
         } else if userInterfaceMode == .Signup {
@@ -154,6 +206,8 @@ class LoginViewController: UIViewController {
     }
 
     @IBAction func didClickSignupButton(sender: UIButton) {
+        hideKeyboard()
+        
         if userInterfaceMode == .Signin {
             userInterfaceMode = .Signup
         } else if userInterfaceMode == .Signup {
@@ -170,6 +224,8 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction func didClick1PasswordIcon(sender: UIButton) {
+        hideKeyboard()
+        
         if !OnePasswordExtension.sharedExtension().isAppExtensionAvailable() {
             show1PasswordUnavailableAlert()
             return
@@ -177,12 +233,20 @@ class LoginViewController: UIViewController {
             if userInterfaceMode == .Signin {
                 loginFrom1Password(sender)
             } else if userInterfaceMode == .Signup {
+                let account = Account.account(username: usernameTextField.text, password: passwordTextField.text, firstName: firstNameTextField.text, lastName: lastNameTextField.text)
+                if !account.isValid() {
+                    showReminderAlert(title: "Invalid Account", message: "first name, last name, username and password are all required!")
+                    return
+                }
+                
                 saveLoginTo1Password(sender)
             }
         }
     }
     
     @IBAction func didClickForgetPassword(sender: UIButton) {
+        hideKeyboard()
+        
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let accountsViewController = storyboard.instantiateViewControllerWithIdentifier(StoryboardID.accountsViewController) as! AccountsViewController
         let navigationController = UINavigationController(rootViewController: accountsViewController)
@@ -191,25 +255,71 @@ class LoginViewController: UIViewController {
     
     // MARK: - 1Password
     private func loginFrom1Password(sender: UIButton) {
+        // About URLString,if 1Password doesn't find any matching password, 1Password will show all logins.
         OnePasswordExtension.sharedExtension().findLoginForURLString(AppInfo.urlString, forViewController: self, sender: sender, completion: { (loginDictionary, error) -> Void in
-            if loginDictionary?.isEmpty == true {
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
                 return
             }
             
-            if let username = loginDictionary![AppExtensionUsernameKey] as? String {
-                self.usernameTextField.text = username
-                NSNotificationCenter.defaultCenter().postNotificationName(UITextFieldTextDidChangeNotification, object: self.usernameTextField)
+            if let loginDictionary = loginDictionary {
+                if loginDictionary.isEmpty == true {
+                    return
+                }
+                
+                if let username = loginDictionary[AppExtensionUsernameKey] as? String {
+                    self.usernameTextField.text = username
+                    NSNotificationCenter.defaultCenter().postNotificationName(UITextFieldTextDidChangeNotification, object: self.usernameTextField)
+                }
+                
+                if let password = loginDictionary[AppExtensionPasswordKey] as? String {
+                    self.passwordTextField.text = password
+                    NSNotificationCenter.defaultCenter().postNotificationName(UITextFieldTextDidChangeNotification, object: self.passwordTextField)
+                }
             }
-            if let password = loginDictionary![AppExtensionPasswordKey] as? String {
-                self.passwordTextField.text = password
-                NSNotificationCenter.defaultCenter().postNotificationName(UITextFieldTextDidChangeNotification, object: self.passwordTextField)
-            }
-            
         })
     }
     
     private func saveLoginTo1Password(sender: UIButton) {
+        let loginDetails: [String: AnyObject] = [AppExtensionTitleKey: AppInfo.title,
+            AppExtensionUsernameKey: usernameTextField.text!,
+            AppExtensionPasswordKey: passwordTextField.text!,
+            AppExtensionNotesKey: "Saved by OnePasswordExtension",
+            AppExtensionSectionTitleKey: "OnePasswordExtension",
+            AppExtensionFieldsKey: ["firstname": firstNameTextField.text!, "lastname": lastNameTextField.text!]]
         
+        let passwordGenerationOptions = [
+            // The minimum password length can be 4 or more.
+            // AppExtensionGeneratedPasswordMinLengthKey: 8,
+            
+            // The maximum password length can be 50 or less.
+            // AppExtensionGeneratedPasswordMaxLengthKey: 30,
+            
+            // If YES, the 1Password will guarantee that the generated password will contain at least one digit (number between 0 and 9). Passing NO will not exclude digits from the generated password.
+            AppExtensionGeneratedPasswordRequireDigitsKey: false,
+            
+            // If YES, the 1Password will guarantee that the generated password will contain at least one symbol (See the list bellow). Passing NO with will exclude symbols from the generated password.
+            AppExtensionGeneratedPasswordRequireSymbolsKey: false,
+            
+            // Here are all the symbols available in the the 1Password Password Generator:
+            // !@#$%^&*()_-+=|[]{}'\";.,>?/~`
+            // The string for AppExtensionGeneratedPasswordForbiddenCharactersKey should contain the symbols and characters that you wish 1Password to exclude from the generated password.
+            // AppExtensionGeneratedPasswordForbiddenCharactersKey: "!@#$%/0lIO",
+        ]
+        
+        OnePasswordExtension.sharedExtension().storeLoginForURLString(AppInfo.urlString, loginDetails: loginDetails, passwordGenerationOptions: passwordGenerationOptions, forViewController: self, sender: sender) { (loginDictionary, error) -> Void in
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+                return
+            }
+            
+            if let loginDictionary = loginDictionary {
+                if loginDictionary.isEmpty == true {
+                    return
+                }
+                print("Account has been stored: \r\(loginDictionary)")
+            }
+        }
     }
     
     // MARK: - Account
@@ -235,8 +345,7 @@ class LoginViewController: UIViewController {
         
         let account = Account.account(username: username, password: password, firstName: firstName, lastName: lastName)
         AccountDataBase.storeAccount(account, success: { Void in
-            self.resetUI()
-            self.showReminderAlert(title: "Congratulation!", message: "\(firstName) \(lastName), successfully signed up “\(username)”.")
+                self.showSignupSuccessAlert(account: account)
             }, failure: { Void in
                 self.showReminderAlert(title: "Sorry!", message: "\(firstName) \(lastName), fail to sign up “\(username)”.")
         })

@@ -38,6 +38,33 @@ class AccountDataBase: NSObject {
         return nil
     }
     
+    class func updateAccount(username username:String, newAccount: Account, success: Void -> Void, failure: Void -> Void) {
+        if !newAccount.isValid() {
+            failure()
+            return
+        }
+        
+        let newAccountData = NSKeyedArchiver.archivedDataWithRootObject(newAccount)
+        
+        if let accounts = NSUserDefaults.standardUserDefaults().valueForKey(UserDefaultsKey.onePasswordExampleAccount) as? [NSData] {
+            var accountDataArray = accounts
+            
+            for (index, accountData) in accountDataArray.enumerate() {
+                if let account = NSKeyedUnarchiver.unarchiveObjectWithData(accountData) as? Account {
+                    if account.username == username {
+                        accountDataArray.removeAtIndex(index)
+                        break
+                    }
+                }
+            }
+            
+            accountDataArray.append(newAccountData)
+            NSUserDefaults.standardUserDefaults().setValue(accountDataArray, forKey: UserDefaultsKey.onePasswordExampleAccount)
+        }
+        
+        success()
+    }
+    
     class func storeAccount(account: Account, success: Void -> Void, failure: Void -> Void) {
         if !account.isValid() {
             failure()

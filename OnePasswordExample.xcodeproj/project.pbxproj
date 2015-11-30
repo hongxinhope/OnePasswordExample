@@ -14,6 +14,7 @@
 		D307215E1C082BA2006698A2 /* OnePasswordExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D307215D1C082BA2006698A2 /* OnePasswordExtension.framework */; };
 		D307215F1C082BA2006698A2 /* OnePasswordExtension.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D307215D1C082BA2006698A2 /* OnePasswordExtension.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D34208681C0AFD770053394A /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34208671C0AFD770053394A /* WelcomeViewController.swift */; };
+		D394FDFA1C0C0B5E00786C50 /* ChangePasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D394FDF91C0C0B5E00786C50 /* ChangePasswordViewController.swift */; };
 		D3CF8A751C0AE92300CACB2F /* AccountsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CF8A741C0AE92300CACB2F /* AccountsViewController.swift */; };
 		D3CF8A771C0AF2E900CACB2F /* AccountDataBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CF8A761C0AF2E900CACB2F /* AccountDataBase.swift */; };
 		D3CF8A791C0AF35A00CACB2F /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CF8A781C0AF35A00CACB2F /* Account.swift */; };
@@ -42,6 +43,7 @@
 		D3013E371C07F81100266EE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D307215D1C082BA2006698A2 /* OnePasswordExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OnePasswordExtension.framework; path = Carthage/Build/iOS/OnePasswordExtension.framework; sourceTree = "<group>"; };
 		D34208671C0AFD770053394A /* WelcomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
+		D394FDF91C0C0B5E00786C50 /* ChangePasswordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChangePasswordViewController.swift; sourceTree = "<group>"; };
 		D3CF8A741C0AE92300CACB2F /* AccountsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountsViewController.swift; sourceTree = "<group>"; };
 		D3CF8A761C0AF2E900CACB2F /* AccountDataBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountDataBase.swift; sourceTree = "<group>"; };
 		D3CF8A781C0AF35A00CACB2F /* Account.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
@@ -85,6 +87,7 @@
 				D3013E2D1C07F81100266EE2 /* LoginViewController.swift */,
 				D3CF8A741C0AE92300CACB2F /* AccountsViewController.swift */,
 				D34208671C0AFD770053394A /* WelcomeViewController.swift */,
+				D394FDF91C0C0B5E00786C50 /* ChangePasswordViewController.swift */,
 				D3013E2F1C07F81100266EE2 /* Main.storyboard */,
 				D3013E321C07F81100266EE2 /* Assets.xcassets */,
 				D3013E371C07F81100266EE2 /* Info.plist */,
@@ -125,6 +128,7 @@
 				TargetAttributes = {
 					D3013E271C07F81100266EE2 = {
 						CreatedOnToolsVersion = 7.1.1;
+						DevelopmentTeam = LB9SBP8N67;
 					};
 				};
 			};
@@ -169,6 +173,7 @@
 				D34208681C0AFD770053394A /* WelcomeViewController.swift in Sources */,
 				D3CF8A771C0AF2E900CACB2F /* AccountDataBase.swift in Sources */,
 				D3013E2C1C07F81100266EE2 /* AppDelegate.swift in Sources */,
+				D394FDFA1C0C0B5E00786C50 /* ChangePasswordViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,7 +227,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -261,7 +266,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -273,6 +278,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -281,6 +288,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = hongxin.OnePasswordExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -288,6 +296,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -296,6 +306,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = hongxin.OnePasswordExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};

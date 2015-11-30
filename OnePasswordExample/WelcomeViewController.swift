@@ -9,6 +9,11 @@
 import UIKit
 
 class WelcomeViewController: UIViewController {
+    // MARK: - Structs
+    private struct StoryboardID {
+        static let changePasswordViewController = "ChangePasswordViewController"
+    }
+    
     // MARK: - Properties
     @IBOutlet weak var welcomeLabel: UILabel!
     
@@ -23,18 +28,22 @@ class WelcomeViewController: UIViewController {
     
     // MARK: - Helper
     private func setupUI() {
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .Plain, target: self, action: "didClickCancel:")
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .Plain, target: self, action: "didClickLogout:")
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Change Password", style: .Done, target: self, action: "didClickChangePassword:")
         welcomeLabel.font = UIFont(name: "HelveticaNeue-Light", size: 40)
         welcomeLabel.text = "Welcome \(loginAccount.firstName!) \(loginAccount.lastName!),\ryou have signed in successfully!"
     }
     
     // MARK: - Selector
-    func didClickCancel(sender: UIBarButtonItem) {
+    func didClickLogout(sender: UIBarButtonItem) {
         dismissViewControllerAnimated(true, completion: nil)
     }
     
     func didClickChangePassword(sender: UIBarButtonItem) {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let changePasswordViewController = storyboard.instantiateViewControllerWithIdentifier(StoryboardID.changePasswordViewController) as! ChangePasswordViewController
+        changePasswordViewController.loginAccount = loginAccount
         
+        navigationController?.pushViewController(changePasswordViewController, animated: true)
     }
 }

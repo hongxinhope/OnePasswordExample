@@ -8,7 +8,7 @@
 
 import UIKit
 
-class Account: NSObject, NSCoding {
+class Account: NSObject, NSCoding, NSCopying {
     private struct EncodeKeys {
         static let username = "username"
         static let password = "password"
@@ -32,6 +32,11 @@ class Account: NSObject, NSCoding {
     
     override init() {
         
+    }
+    
+    func copyWithZone(zone: NSZone) -> AnyObject {
+        let copyAccount = Account.account(username: username, password: password, firstName: firstName, lastName: lastName)
+        return copyAccount
     }
     
     required init?(coder aDecoder: NSCoder) {
